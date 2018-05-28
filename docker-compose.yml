@@ -1,0 +1,35 @@
+version: '3'
+services:
+  redis:
+    image: redis:3.2.11
+  db:
+    image: postgres:10.4
+    volumes:
+      - db:/var/lib/postgresql/data
+  app:
+    build: .
+    image: "${PROJECT_NAME}"
+    environment:
+      DATABASE_HOSTNAME: db
+      LINES: 40
+      COLUMNS: 120
+    working_dir: /home/${PROJECT_NAME}
+    tmpfs: /tmp
+    volumes:
+      # project folder
+      - ../:/home/${PROJECT_NAME}
+      # depends save folder
+      - bundle:/usr/local/bundle
+      - yarn:/usr/local/share/.cache/yarn
+      - node_modules:/home/${PROJECT_NAME}/node_modules
+    links:
+      - db
+      - redis
+    depends_on:
+      - db
+      - redis
+volumes:
+  db:
+  node_modules:
+  yarn:
+  bundle:
