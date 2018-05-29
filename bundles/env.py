@@ -69,7 +69,7 @@ def action(command):
 
 SERVICE_NAME = 'app'
 
-up = action('up -d %s'%SERVICE_NAME)
+up = action('up --build -d %s'%SERVICE_NAME)
 down = action('down --remove-orphans')
 start = action('start')
 stop = action('stop')
