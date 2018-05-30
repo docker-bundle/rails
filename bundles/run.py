@@ -67,7 +67,7 @@ actions = {
         'action': migrate
     },
     'rails:seed': {
-        'desc': 'Migrate and Run seed',
+        'desc': 'Install depends, migrate db and run seed',
         'action': seed
     },
     'rails:c': {
