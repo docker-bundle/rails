@@ -7,8 +7,7 @@ services:
     volumes:
       - db:/var/lib/postgresql/data
   app:
-    build: .
-    image: "${PROJECT_NAME}"
+    image: dockerbundle/rails
     environment:
       DATABASE_HOSTNAME: db
       LINES: 40
