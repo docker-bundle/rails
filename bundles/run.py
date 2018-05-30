@@ -15,7 +15,28 @@ def seed(args = []):
     env.run(['%s && %s'%(COMMAND_DEPENDENCES, COMMAND_DB_SEED)])
 
 def rails_new(args = []):
-    env.run(['gem install rails && rails new . -d postgresql --webpack=vue'])
+    if 0 == env.run(['gem install rails && rails new . -d postgresql --webpack=vue']):
+        print(
+"""
+=============================================================================================
+            INSTALL FINISH
+=============================================================================================
+
+Now you will add this config (inside '++++') manually by default database connection config
+
+Open `config/database.yml`:
+------------------------------------------------------------------------------
+default: &default
+  ...
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  username: postgres
+  password:
+  host: <%= ENV.fetch('DATABASE_HOSTNAME', '127.0.0.1') %>
+  port: 5432
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  ...
+------------------------------------------------------------------------------
+""")
 
 def rails_c(args = []):
     env.run(['rails c'])

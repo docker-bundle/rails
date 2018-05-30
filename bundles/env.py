@@ -64,7 +64,7 @@ def action(command):
         _command = command
         if len(args) > 0:
             _command += (' ' + ' '.join(args))
-        docker_compose()(_command)
+        return docker_compose()(_command)
     return _run
 
 SERVICE_NAME = 'app'
@@ -77,8 +77,8 @@ def restart(args = []):
     stop()
     start()
 def run(args = []):
-    docker_compose()("run --rm %s sh -c '%s'"%(SERVICE_NAME, ' '.join(args)))
-shell = action('exec %s sh'%SERVICE_NAME)
+    return docker_compose()("run --rm %s sh -c '%s'"%(SERVICE_NAME, ' '.join(args)))
+shell = action('exec %s bash'%SERVICE_NAME)
 _exec = action('exec %s'%SERVICE_NAME)
 logs  = action('logs')
 
@@ -88,7 +88,7 @@ actions = {
     'env:init': {'desc': 'Initial Project Env Config','action': init},
     'run': {'desc': 'Run a command with a container', 'action': run},
     'exec': {'desc': 'Exec a command in container', 'action': _exec},
-    'shell': {'desc': 'Shell', 'action': shell},
+    'shell': {'desc': 'Open a Shell into container, if container not start, use `run bash`', 'action': shell},
     'logs': {'desc': 'Show logs', 'action': logs},
     'up': {'desc': 'Create && start server', 'action': up},
     'down': {'desc': 'Stop && remove  server', 'action': down},
