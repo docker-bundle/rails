@@ -6,7 +6,7 @@ COMMAND_DB_SEED=COMMAND_DB_MIGRATE + ' && rails db:seed'
 COMMAND_PREPARE='rails assets:precompile'
 
 def prepare(args = []):
-    env.run(['%s && %s'%(COMMAND_DEPENDENCES, COMMAND_PREPARE)])
+    env.run(['%s && %s'%(COMMAND_DEPENDENCES, COMMAND_PREPARE)], '--no-deps')
 
 def migrate(args = []):
     env.run(['%s && %s'%(COMMAND_DEPENDENCES, COMMAND_DB_MIGRATE)])
@@ -44,6 +44,12 @@ def rails_c(args = []):
 def rails_drop(args = []):
     env.run(['rails db:drop'])
 
+def rails_publish(args = []):
+    prepare()
+    env.down()
+    migrate()
+    env.up()
+
 all_envs = ['development', 'staging', 'production']
 if env.env not in all_envs:
     print("-"*100)
@@ -63,7 +69,7 @@ actions = {
         'action': rails_new
     },
     'rails:sync': {
-        'desc': 'Install depends, Migrate db',
+        'desc': 'Install depends, migrate db',
         'action': migrate
     },
     'rails:seed': {
@@ -88,6 +94,10 @@ no_production_actions = {
 }
 
 no_development_actions = {
+    'rails:publish': {
+        'desc': 'Compile assets and restart all servers (only available staging/production environments)',
+        'action': rails_publish
+    }
 }
 
 if env.env != 'production':
