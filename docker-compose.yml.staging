@@ -1,5 +1,9 @@
 version: '3'
 services:
+  redis:
+    restart: always
+  db:
+    restart: always
   app:
     command:  sh -c "bundle exec rails s -b 0.0.0.0 -p 3000 -P /tmp/server.pid"
     restart: always
