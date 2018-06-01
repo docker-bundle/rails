@@ -1,0 +1,12 @@
+version: '3'
+services:
+  app:
+    working_dir: /deploy/${PROJECT_NAME}_${ENV}
+    volumes:
+      - nginx-deploy:/deploy
+      - node_modules:/deploy/${PROJECT_NAME}_${ENV}_new/node_modules
+    ports: []
+volumes:
+  nginx-deploy:
+    external: true
+

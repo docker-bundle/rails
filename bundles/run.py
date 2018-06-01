@@ -6,7 +6,7 @@ COMMAND_DB_SEED=COMMAND_DB_MIGRATE + ' && rails db:seed'
 COMMAND_PREPARE='rails assets:precompile'
 
 def prepare(args = []):
-    env.run(['%s && %s'%(COMMAND_DEPENDENCES, COMMAND_PREPARE)], '--no-deps')
+    env.run(['%s && %s'%(COMMAND_DEPENDENCES, COMMAND_PREPARE)], run_args = '--no-deps')
 
 def migrate(args = []):
     env.run(['%s && %s'%(COMMAND_DEPENDENCES, COMMAND_DB_MIGRATE)])

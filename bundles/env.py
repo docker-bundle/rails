@@ -76,8 +76,8 @@ stop = action('stop')
 def restart(args = []):
     stop()
     start()
-def run(args = [], command_args = ''):
-    return docker_compose()("run %s --rm %s sh -c '%s'"%(command_args, SERVICE_NAME, ' '.join(args)))
+def run(args = [], *, run_args = '', compose_args = ''):
+    return docker_compose()("%s run %s --rm %s sh -c '%s'"%(compose_args, run_args, SERVICE_NAME, ' '.join(args)))
 shell = action('exec %s bash'%SERVICE_NAME)
 _exec = action('exec %s'%SERVICE_NAME)
 logs  = action('logs')
@@ -96,3 +96,5 @@ actions = {
     'stop': {'desc': 'Stop server', 'action': stop},
     'restart': {'desc': 'Restart server', 'action': restart}
 }
+
+

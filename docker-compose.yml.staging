@@ -5,7 +5,7 @@ services:
   db:
     restart: always
   app:
-    command:  sh -c "bundle exec rails s -b 0.0.0.0 -p 3000 -P /tmp/server.pid"
+    command:  sh -c "SECRET_KEY_BASE=`bundle exec rails secret` bundle exec rails s -b 0.0.0.0 -p 3000 -P /tmp/server.pid"
     restart: always
     ports:
       # site
@@ -14,4 +14,5 @@ services:
       RAILS_ENV: production
       RAILS_SERVE_STATIC_FILES: 1
       DISABLE_DATABASE_ENVIRONMENT_CHECK: 1
+
 
