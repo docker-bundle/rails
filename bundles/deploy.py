@@ -25,7 +25,6 @@ def copy_project_into_volume():
             )
 
 ADD_DEPLOY_CONFIG = ' -f docker-compose.yml.deploy '
-
 def call_docker_compose_deploy(command):
     return os.system(env.docker_compose(ADD_DEPLOY_CONFIG + command))
 

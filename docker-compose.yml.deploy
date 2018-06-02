@@ -1,12 +1,22 @@
 version: '3'
 services:
+  db:
+    networks:
+      - nginx-deploy
+  redis:
+    networks:
+      - nginx-deploy
   app:
+    networks:
+      - nginx-deploy
     working_dir: /deploy/${PROJECT_NAME}_${ENV}
     volumes:
       - nginx-deploy:/deploy
       - node_modules:/deploy/${PROJECT_NAME}_${ENV}_new/node_modules
-    ports: []
 volumes:
+  nginx-deploy:
+    external: true
+networks:
   nginx-deploy:
     external: true
 
