@@ -21,71 +21,69 @@ def init(args = []):
     env_file.write("PROJECT_NAME=%s"%project_name.replace(' ', '_').replace(':', '_'))
     env_file.flush()
     env_file.close()
+    os.environ['PROJECT_NAME'] = project_name
     print()
 
 #--------------------------------------------------------------------------------------
 
 load_env()
 
+if not os.environ.get('PROJECT_NAME'):
+    init()
+
 config_file_name = 'docker-compose.yml'
 env = os.environ.get('ENV', 'development')
 project_name = os.environ.get('PROJECT_NAME')
-
-if not project_name:
-    init()
 
 DOCKER_COMPOSE='docker-compose'
 WINPTY = 'winpty'
 if 0 == os.system('type %s > /dev/null 2>&1'%WINPTY):
     DOCKER_COMPOSE=WINPTY + ' ' + DOCKER_COMPOSE
 
-def docker_compose():
+def docker_compose(command):
     env_compose_file = ''
     name = project_name
     if env != '':
         name += '_' + env
         env_compose_file = '-f %s.%s'%(config_file_name, env)
-    def run(command):
-        return os.system("%s --project-name %s -f %s %s %s"%(DOCKER_COMPOSE, name, config_file_name, env_compose_file, command))
-    return run
+    return "%s --project-name %s -f %s %s %s "%(DOCKER_COMPOSE, name, config_file_name, env_compose_file, command)
 
 def action(command):
     def _run(args = []):
         _command = command
         if len(args) > 0:
             _command += (' ' + ' '.join(args))
-        return docker_compose()(_command)
+        return os.system(_command)
     return _run
 
 SERVICE_NAME = 'app'
 
-up = action('up --build -d %s'%SERVICE_NAME)
-down = action('down --remove-orphans')
-start = action('start')
-stop = action('stop')
-def restart(args = []):
-    stop()
-    start()
-def run(args = [], *, run_args = '', compose_args = ''):
-    return docker_compose()("%s run %s --rm %s sh -c '%s'"%(compose_args, run_args, SERVICE_NAME, ' '.join(args)))
-shell = action('exec %s bash'%SERVICE_NAME)
-_exec = action('exec %s'%SERVICE_NAME)
-logs  = action('logs')
+up = lambda :('up --build -d %s'%SERVICE_NAME)
+down = lambda :('down --remove-orphans')
+start = lambda :('start')
+stop = lambda :('stop')
+shell = lambda :('exec %s bash'%SERVICE_NAME)
+_exec = lambda :('exec %s'%SERVICE_NAME)
+logs  = lambda :('logs')
+
+def run(args = [], *, run_args = ''):
+    return ("run %s --rm %s sh -c '%s'"%(run_args, SERVICE_NAME, ' '.join(args)))
+
+def action_run(args = []):
+    return os.system(docker_compose(run(args)))
 
 #--------------------------------------------------------------------------------------
 
-actions = {
+_actions = {
     'env:init': {'desc': 'Initial Project Env Config','action': init},
-    'run': {'desc': 'Run a command with a container', 'action': run},
-    'exec': {'desc': 'Exec a command in container', 'action': _exec},
-    'shell': {'desc': 'Open a Shell into container, if container not start, use `run bash`', 'action': shell},
-    'logs': {'desc': 'Show logs', 'action': logs},
-    'up': {'desc': 'Create && start server', 'action': up},
-    'down': {'desc': 'Stop && remove  server', 'action': down},
-    'start': {'desc': 'Start server', 'action': start},
-    'stop': {'desc': 'Stop server', 'action': stop},
-    'restart': {'desc': 'Restart server', 'action': restart}
+    'run': {'desc': 'Run a command with a container', 'action': action_run},
+    'exec': {'desc': 'Exec a command in container', 'action': action(docker_compose(_exec()))},
+    'shell': {'desc': 'Open a Shell into container, if container not start, use `run bash`', 'action': action(docker_compose(shell()))},
+    'logs': {'desc': 'Show logs', 'action': action(docker_compose(logs()))},
+    'up': {'desc': 'Create && start server', 'action': action(docker_compose(up()))},
+    'down': {'desc': 'Stop && remove  server', 'action': action(docker_compose(down()))},
+    'start': {'desc': 'Start server', 'action': action(docker_compose(start()))},
+    'stop': {'desc': 'Stop server', 'action': action(docker_compose(stop()))},
+    'restart': {'desc': 'Restart server', 'action': action(docker_compose(stop()) + " && " + docker_compose(start()))}
 }
-
-
 

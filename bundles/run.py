@@ -1,3 +1,4 @@
+import os
 import env
 
 COMMAND_DEPENDENCES='yarn --ignore-engines && bundle'
@@ -6,16 +7,19 @@ COMMAND_DB_SEED=COMMAND_DB_MIGRATE + ' && rails db:seed'
 COMMAND_PREPARE='rails assets:precompile'
 
 def prepare(args = []):
-    env.run(['%s && %s'%(COMMAND_DEPENDENCES, COMMAND_PREPARE)], run_args = '--no-deps')
+    os.system(env.docker_compose(env.run(['%s && %s'%(COMMAND_DEPENDENCES, COMMAND_PREPARE)], run_args = '--no-deps')))
+
+def sync(args = []):
+    os.system(env.docker_compose(env.run(['%s && %s'%(COMMAND_DEPENDENCES, COMMAND_DB_MIGRATE)])))
 
 def migrate(args = []):
-    env.run(['%s && %s'%(COMMAND_DEPENDENCES, COMMAND_DB_MIGRATE)])
+    os.system(env.docker_compose(env.run(['%s'%(COMMAND_DB_MIGRATE)])))
 
 def seed(args = []):
-    env.run(['%s && %s'%(COMMAND_DEPENDENCES, COMMAND_DB_SEED)])
+    os.system(env.docker_compose(env.run(['%s && %s'%(COMMAND_DEPENDENCES, COMMAND_DB_SEED)])))
 
 def rails_new(args = []):
-    if 0 == env.run(['gem install rails && rails new . -d postgresql --webpack=vue']):
+    if 0 == os.system(env.docker_compose(env.run(['gem install rails && rails new . -d postgresql --webpack=vue']))):
         print(
 """
 =============================================================================================
@@ -39,16 +43,16 @@ default: &default
 """)
 
 def rails_c(args = []):
-    env.run(['rails c'])
+    os.system(env.docker_compose(env.run(['rails c'])))
 
 def rails_drop(args = []):
-    env.run(['rails db:drop'])
+    os.system(env.docker_compose(env.run(['rails db:drop'])))
 
 def rails_publish(args = []):
     prepare()
-    env.down()
+    os.system(env.docker_compose(env.down()))
     migrate()
-    env.up()
+    os.system(env.docker_compose(env.up()))
 
 all_envs = ['development', 'staging', 'production']
 if env.env not in all_envs:
@@ -63,14 +67,18 @@ print("")
 print("    ENV=%s               [development(default), staging, production]    ( -e ENV=?)"%(env.env))
 print("-"*100)
 
-actions = {
+_actions = {
     'rails:new': {
         'desc': 'Create new rails project here in docker',
         'action': rails_new
     },
+    'rails:migrate': {
+        'desc': 'Migrate db',
+        'action': migrate
+    },
     'rails:sync': {
         'desc': 'Install depends, migrate db',
-        'action': migrate
+        'action': sync
     },
     'rails:seed': {
         'desc': 'Install depends, migrate db and run seed',
@@ -101,7 +109,8 @@ no_development_actions = {
 }
 
 if env.env != 'production':
-    actions.update(no_production_actions)
+    _actions.update(no_production_actions)
 
 if env.env == 'staging' or env.env == 'production':
-    actions.update(no_development_actions)
+    _actions.update(no_development_actions)
+

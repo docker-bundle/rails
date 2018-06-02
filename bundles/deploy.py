@@ -8,9 +8,9 @@ def copy_project_into_volume():
     import docker
     client = docker.from_env()
     container = client.containers.run('alpine/git',
-            "-c 'mkdir -p %(output_path)s  && git archive --format=tar %(env)s | tar -x -C  %(output_path)s &&\
+            "-c 'mkdir -p %(output_path)s  && git archive --format=tar %(branch)s | tar -x -C  %(output_path)s &&\
                     cp -r docker/env/%(env)s/* %(output_path)s/'"%{ 'output_path': VOLUME_PATH + "_new",
-                        'env': env.env, 'remote': env.get_env('REMOTE', 'origin')},
+                        'env': env.env, 'branch': os.environ.get('BRANCH', env.env)},
             volumes = {
                 'nginx-deploy': {
                     'bind': '/deploy'
@@ -24,24 +24,28 @@ def copy_project_into_volume():
             entrypoint='sh'
             )
 
-ADD_DEPLOY_CONFIG = '-f docker-compose.yml.deploy'
+ADD_DEPLOY_CONFIG = ' -f docker-compose.yml.deploy '
 
-def run_deploy(command):
-    return env.run([command], compose_args = ADD_DEPLOY_CONFIG)
+def call_docker_compose_deploy(command):
+    return os.system(env.docker_compose(ADD_DEPLOY_CONFIG + command))
 
 def deploy(args = []):
     copy_project_into_volume()
-    if 0 != run_deploy("cd %(output_path)s_new && %(prepare)s && cd .. && mv %(output_path)s %(output_path)s_old &&\
+    if 0 != call_docker_compose_deploy(env.run(["cd %(output_path)s_new && %(prepare)s"\
+            %{'prepare': (run.COMMAND_DEPENDENCES + ' && ' + run.COMMAND_PREPARE), 'output_path': VOLUME_PATH}])):
+        return
+    call_docker_compose_deploy(env.down())
+    if 0 != call_docker_compose_deploy(env.run(["cd .. && mv %(output_path)s %(output_path)s_old &&\
             rm -rf %(output_path)s_old && mv %(output_path)s_new %(output_path)s"\
-            %{'prepare': (run.COMMAND_DEPENDENCES + ' && ' + run.COMMAND_PREPARE), 'output_path': VOLUME_PATH}):
+            %{'output_path': VOLUME_PATH}])):
         return
-    env.down()
-    if 0 != run_deploy(run.COMMAND_DB_MIGRATE):
+    if 0 != call_docker_compose_deploy(env.run([run.COMMAND_DB_MIGRATE])):
         return
-    env.docker_compose()(ADD_DEPLOY_CONFIG + ' up --build -d ' + env.SERVICE_NAME)
+    call_docker_compose_deploy(env.up())
 
+_actions = {}
 if env.env == 'staging' or env.env == 'production':
-    actions = {
+    _actions = {
         'rails:deploy': {
             'desc': """Deploy into docker as Server.
                                   Before use it:
@@ -50,3 +54,4 @@ if env.env == 'staging' or env.env == 'production':
             'action': deploy
         }
     }
+
