@@ -1,16 +1,12 @@
 import os
 
 def load_env():
-    env_set = {}
     try:
         for e in list(filter(lambda x:x!='', map(lambda x:x.strip(), open('.env').readlines()))):
             k,v = e.split('=')
-            env_set[k] = v
+            os.environ[k] = v
     except:
         pass
-    return env_set
-
-env_set = load_env()
 
 def input_default(text, default):
     value = input(text + ' [' + default + ']:')
@@ -27,22 +23,16 @@ def init(args = []):
     env_file.close()
     print()
 
-def get_env(env_name, default = ''):
-    if env_name in env_set:
-        return env_set[env_name]
-    if env_name in os.environ:
-        return os.environ[env_name]
-    return default
-
-project_name = get_env('PROJECT_NAME')
-
-if project_name == '':
-    init()
-
 #--------------------------------------------------------------------------------------
 
+load_env()
+
 config_file_name = 'docker-compose.yml'
-env = get_env('ENV', 'development')
+env = os.environ.get('ENV', 'development')
+project_name = os.environ.get('PROJECT_NAME')
+
+if not project_name:
+    init()
 
 DOCKER_COMPOSE='docker-compose'
 WINPTY = 'winpty'
@@ -96,5 +86,6 @@ actions = {
     'stop': {'desc': 'Stop server', 'action': stop},
     'restart': {'desc': 'Restart server', 'action': restart}
 }
+
 
 
