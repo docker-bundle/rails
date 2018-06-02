@@ -8,7 +8,9 @@ services:
       - nginx-deploy
   app:
     networks:
-      - nginx-deploy
+      nginx-deploy:
+        aliases:
+          - ${PROJECT_NAME}_${ENV}
     working_dir: /deploy/${PROJECT_NAME}_${ENV}
     volumes:
       - nginx-deploy:/deploy

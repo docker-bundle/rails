@@ -6,7 +6,7 @@ server_name = env.project_name + '_' + env.env
 def conf(args = []):
     if len(args) == 0:
         print('Usage:')
-        print('     nginx:conf [domain1] [domain2] ...')
+        print('     nginx:config [domain1] [domain2] ...')
         return
     print()
     print('         Nginx.conf')
@@ -92,7 +92,7 @@ def nginx_down(args = []):
     except:
         print(sys.exc_info()[1])
 
-def nginx_commit(args = []):
+def nginx_add(args = []):
     os.system('docker cp site/%(server_name)s %(name)s:/etc/nginx/conf.d//%(server_name)s.conf && docker exec %(name)s nginx -s reload'%{'server_name': server_name, 'name': name})
 
 def nginx_remove(args = []):
@@ -103,13 +103,13 @@ def nginx_remove(args = []):
 _actions = {}
 if env.env == 'staging' or env.env == 'production':
     _actions = {
-        'nginx:conf': {
+        'nginx:config': {
             'desc': 'Configure nginx',
             'action': conf
         },
-        'nginx:commit': {
+        'nginx:add': {
             'desc': 'Commit nginx.conf to nginx',
-            'action': nginx_commit
+            'action': nginx_add
         },
         'nginx:remove': {
             'desc': 'Remove nginx.conf from nginx',
