@@ -29,6 +29,7 @@ def call_docker_compose_deploy(command):
     return os.system(env.docker_compose(ADD_DEPLOY_CONFIG + command))
 
 def deploy(args = []):
+    run.init_volumes()
     copy_project_into_volume()
     if 0 != call_docker_compose_deploy(env.run(["cd %(output_path)s_new && %(prepare)s"\
             %{'prepare': (run.COMMAND_DEPENDENCES + ' && ' + run.COMMAND_PREPARE), 'output_path': VOLUME_PATH}])):

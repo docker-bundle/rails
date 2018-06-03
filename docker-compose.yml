@@ -30,5 +30,11 @@ services:
 volumes:
   db:
   node_modules:
+    external:
+      name: ${PROJECT_NAME}_node_modules
   yarn:
+    external:
+      name: ${PROJECT_NAME}_yarn
   bundle:
+    external:
+      name: ${PROJECT_NAME}_bundle

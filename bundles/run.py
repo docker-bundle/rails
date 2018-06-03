@@ -6,19 +6,37 @@ COMMAND_DB_MIGRATE='rails db:create && rails db:migrate'
 COMMAND_DB_SEED=COMMAND_DB_MIGRATE + ' && rails db:seed'
 COMMAND_PREPARE='rails assets:precompile'
 
+def init_volumes():
+    import docker
+    client = docker.from_env()
+    volumes = ['yarn', 'node_modules', 'bundle']
+    for volume in volumes:
+        volume = env.project_name + '_' + volume
+        try:
+            client.volumes.get(volume)
+            print('[VOLUME]     \'%s\' is up-to-date'%volume)
+        except:
+            client.volumes.create(volume)
+            print('[VOLUME]     \'%s\' is created'%volume)
+
 def prepare(args = []):
+    init_volumes()
     os.system(env.docker_compose(env.run(['%s && %s'%(COMMAND_DEPENDENCES, COMMAND_PREPARE)], run_args = '--no-deps')))
 
 def sync(args = []):
+    init_volumes()
     os.system(env.docker_compose(env.run(['%s && %s'%(COMMAND_DEPENDENCES, COMMAND_DB_MIGRATE)])))
 
 def migrate(args = []):
+    init_volumes()
     os.system(env.docker_compose(env.run(['%s'%(COMMAND_DB_MIGRATE)])))
 
 def seed(args = []):
+    init_volumes()
     os.system(env.docker_compose(env.run(['%s && %s'%(COMMAND_DEPENDENCES, COMMAND_DB_SEED)])))
 
 def rails_new(args = []):
+    init_volumes()
     if 0 == os.system(env.docker_compose(env.run(['gem install rails && rails new . -d postgresql --webpack=vue']))):
         print(
 """
@@ -43,12 +61,15 @@ default: &default
 """)
 
 def rails_c(args = []):
+    init_volumes()
     os.system(env.docker_compose(env.run(['rails c'])))
 
 def rails_drop(args = []):
+    init_volumes()
     os.system(env.docker_compose(env.run(['rails db:drop'])))
 
 def rails_publish(args = []):
+    init_volumes()
     prepare()
     os.system(env.docker_compose(env.down()))
     migrate()

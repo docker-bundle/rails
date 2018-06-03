@@ -40,13 +40,13 @@ WINPTY = 'winpty'
 if 0 == os.system('type %s > /dev/null 2>&1'%WINPTY):
     DOCKER_COMPOSE=WINPTY + ' ' + DOCKER_COMPOSE
 
+
 def docker_compose(command):
-    env_compose_file = ''
-    name = project_name
-    if env != '':
-        name += '_' + env
-        env_compose_file = '-f %s.%s'%(config_file_name, env)
-    return "%s --project-name %s -f %s %s %s "%(DOCKER_COMPOSE, name, config_file_name, env_compose_file, command)
+    return "%s --project-name %s -f %s %s "%(DOCKER_COMPOSE, project_name + '_' + env, config_file_name, command)
+
+def docker_compose_env(command):
+    env_compose_file = ' -f %s.%s '%(config_file_name, env)
+    return docker_compose(env_compose_file + command)
 
 def action(command):
     def _run(args = []):
@@ -70,20 +70,20 @@ def run(args = [], *, run_args = ''):
     return ("run %s --rm %s sh -c '%s'"%(run_args, SERVICE_NAME, ' '.join(args)))
 
 def action_run(args = []):
-    return os.system(docker_compose(run(args)))
+    return os.system(docker_compose_env(run(args)))
 
 #--------------------------------------------------------------------------------------
 
 _actions = {
     'env:init': {'desc': 'Initial Project Env Config','action': init},
     'run': {'desc': 'Run a command with a container', 'action': action_run},
-    'exec': {'desc': 'Exec a command in container', 'action': action(docker_compose(_exec()))},
-    'shell': {'desc': 'Open a Shell into container, if container not start, use `run bash`', 'action': action(docker_compose(shell()))},
-    'logs': {'desc': 'Show logs', 'action': action(docker_compose(logs()))},
-    'up': {'desc': 'Create && start server', 'action': action(docker_compose(up()))},
-    'down': {'desc': 'Stop && remove  server', 'action': action(docker_compose(down()))},
-    'start': {'desc': 'Start server', 'action': action(docker_compose(start()))},
-    'stop': {'desc': 'Stop server', 'action': action(docker_compose(stop()))},
-    'restart': {'desc': 'Restart server', 'action': action(docker_compose(stop()) + " && " + docker_compose(start()))}
+    'exec': {'desc': 'Exec a command in container', 'action': action(docker_compose_env(_exec()))},
+    'shell': {'desc': 'Open a Shell into container, if container not start, use `run bash`', 'action': action(docker_compose_env(shell()))},
+    'logs': {'desc': 'Show logs', 'action': action(docker_compose_env(logs()))},
+    'up': {'desc': 'Create && start server', 'action': action(docker_compose_env(up()))},
+    'down': {'desc': 'Stop && remove  server', 'action': action(docker_compose_env(down()))},
+    'start': {'desc': 'Start server', 'action': action(docker_compose_env(start()))},
+    'stop': {'desc': 'Stop server', 'action': action(docker_compose_env(stop()))},
+    'restart': {'desc': 'Restart server', 'action': action(docker_compose_env(stop()) + " && " + docker_compose_env(start()))}
 }
 

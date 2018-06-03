@@ -1,16 +1,24 @@
 version: '3'
 services:
   db:
+    restart: always
     networks:
-      - nginx-deploy
+      - lan
   redis:
+    restart: always
     networks:
-      - nginx-deploy
+      lan:
   app:
+    command:  sh -c "SECRET_KEY_BASE=`bundle exec rails secret` bundle exec rails s -b 0.0.0.0 -p 3000 -P /tmp/server.pid"
+    restart: always
     networks:
+      lan:
       nginx-deploy:
         aliases:
           - ${PROJECT_NAME}_${ENV}
+    environment:
+      RAILS_ENV: production
+      RAILS_SERVE_STATIC_FILES: 1
     working_dir: /deploy/${PROJECT_NAME}_${ENV}
     volumes:
       - nginx-deploy:/deploy
@@ -21,4 +29,4 @@ volumes:
 networks:
   nginx-deploy:
     external: true
-
+  lan:
