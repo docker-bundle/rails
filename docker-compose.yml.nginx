@@ -1,0 +1,9 @@
+version: '3'
+services:
+  app:
+    volumes:
+      - nginx-deploy:/deploy
+      - ./deploy/${PROJECT_NAME}_${ENV}_nginx/log:/deploy/${PROJECT_NAME}_${ENV}${NEW}/log
+volumes:
+  nginx-deploy:
+    external: true

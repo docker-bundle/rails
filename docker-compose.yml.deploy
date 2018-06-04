@@ -21,11 +21,8 @@ services:
       RAILS_SERVE_STATIC_FILES: 1
     working_dir: /deploy/${PROJECT_NAME}_${ENV}
     volumes:
-      - nginx-deploy:/deploy
-      - node_modules:/deploy/${PROJECT_NAME}_${ENV}_new/node_modules
-volumes:
-  nginx-deploy:
-    external: true
+      - ./deploy:/deploy
+      - node_modules:/deploy/${PROJECT_NAME}_${ENV}${NEW}/node_modules
 networks:
   nginx-deploy:
     external: true
