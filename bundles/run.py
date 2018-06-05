@@ -110,10 +110,6 @@ exports = {
         'desc': 'Install depends, migrate db and run seed',
         'action': seed
     },
-    'rails:reset': {
-        'desc': 'drop && seed',
-        'action': rails_reset
-    },
     'rails:c': {
         'desc': 'Rails console',
         'action': rails_c
@@ -132,7 +128,11 @@ no_production_actions = {
     'rails:drop': {
         'desc': 'Drop database (only available development/staging environments)',
         'action': rails_drop
-    }
+    },
+    'rails:reset': {
+        'desc': 'drop && seed',
+        'action': rails_reset
+    },
 }
 
 no_development_actions = {
