@@ -2,8 +2,12 @@ version: '3'
 services:
   redis:
     image: redis:3.2.11-alpine
+    networks:
+      lan:
   db:
     image: postgres:10.4-alpine
+    networks:
+      lan:
     volumes:
       - db:/var/lib/postgresql/data
   app:
@@ -16,6 +20,8 @@ services:
     tmpfs: /tmp
     expose:
       - 3000
+    networks:
+      lan:
     volumes:
       # project folder
       - ../:/home/${PROJECT_NAME}
@@ -40,3 +46,5 @@ volumes:
   bundle:
     external:
       name: ${PROJECT_NAME}_bundle
+networks:
+  lan:
