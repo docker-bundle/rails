@@ -21,23 +21,23 @@ def init_volumes():
 
 def prepare(args = []):
     init_volumes()
-    os.system(env.docker_compose(env.run(['%s && %s'%(COMMAND_DEPENDENCES, COMMAND_PREPARE)], run_args = '--no-deps')))
+    os.system(env.docker_compose_env(env.run(['%s && %s'%(COMMAND_DEPENDENCES, COMMAND_PREPARE)], run_args = '--no-deps')))
 
 def sync(args = []):
     init_volumes()
-    os.system(env.docker_compose(env.run(['%s && %s'%(COMMAND_DEPENDENCES, COMMAND_DB_MIGRATE)])))
+    os.system(env.docker_compose_env(env.run(['%s && %s'%(COMMAND_DEPENDENCES, COMMAND_DB_MIGRATE)])))
 
 def migrate(args = []):
     init_volumes()
-    os.system(env.docker_compose(env.run(['%s'%(COMMAND_DB_MIGRATE)])))
+    os.system(env.docker_compose_env(env.run(['%s'%(COMMAND_DB_MIGRATE)])))
 
 def seed(args = []):
     init_volumes()
-    os.system(env.docker_compose(env.run(['%s && %s'%(COMMAND_DEPENDENCES, COMMAND_DB_SEED)])))
+    os.system(env.docker_compose_env(env.run(['%s && %s'%(COMMAND_DEPENDENCES, COMMAND_DB_SEED)])))
 
 def rails_new(args = []):
     init_volumes()
-    if 0 == os.system(env.docker_compose(env.run(['gem install rails && rails new . -d postgresql --webpack=vue']))):
+    if 0 == os.system(env.docker_compose_env(env.run(['gem install rails && rails new . -d postgresql --webpack=vue']))):
         print(
 """
 =============================================================================================
@@ -62,18 +62,18 @@ default: &default
 
 def rails_c(args = []):
     init_volumes()
-    os.system(env.docker_compose(env.run(['rails c'])))
+    os.system(env.docker_compose_env(env.run(['rails c'])))
 
 def rails_drop(args = []):
     init_volumes()
-    os.system(env.docker_compose(env.run(['rails db:drop'])))
+    os.system(env.docker_compose_env(env.run(['rails db:drop'])))
 
 def rails_publish(args = []):
     init_volumes()
     prepare()
-    os.system(env.docker_compose(env.down()))
+    os.system(env.docker_compose_env(env.down()))
     migrate()
-    os.system(env.docker_compose(env.up()))
+    os.system(env.docker_compose_env(env.up()))
 
 all_envs = ['development', 'staging', 'production']
 if env.env not in all_envs:
@@ -134,4 +134,3 @@ if env.env != 'production':
 
 if env.env == 'staging' or env.env == 'production':
     _actions.update(no_development_actions)
-
