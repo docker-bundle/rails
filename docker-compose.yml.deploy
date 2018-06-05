@@ -13,17 +13,13 @@ services:
     restart: always
     networks:
       lan:
-      nginx-deploy:
-        aliases:
-          - ${PROJECT_NAME}_${ENV}
     environment:
       RAILS_ENV: production
       RAILS_SERVE_STATIC_FILES: 0
-    working_dir: /deploy/${PROJECT_NAME}_${ENV}
+    working_dir: /deploy/${PROJECT_NAME}_${ENV}${NEW}
     volumes:
       - ./deploy:/deploy
       - node_modules:/deploy/${PROJECT_NAME}_${ENV}${NEW}/node_modules
 networks:
-  nginx-deploy:
-    external: true
   lan:
+
