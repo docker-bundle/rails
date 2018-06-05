@@ -14,6 +14,8 @@ services:
       COLUMNS: 120
     working_dir: /home/${PROJECT_NAME}
     tmpfs: /tmp
+    expose:
+      - 3000
     volumes:
       # project folder
       - ../:/home/${PROJECT_NAME}
