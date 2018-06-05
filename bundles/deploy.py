@@ -31,7 +31,6 @@ def deploy(mode, onlyUp = False):
         return os.system(env.docker_compose(ADD_DEPLOY_CONFIG + command))
     def call_docker_compose_deploy_new(command):
         return os.system('NEW=_new ' + env.docker_compose(ADD_DEPLOY_CONFIG + command))
-    run.init_volumes()
     if not onlyUp:
         if 0 != call_docker_compose_deploy_new(env.run(["cd %(output_path)s_new && %(prepare)s"\
                 %{'prepare': (run.COMMAND_DEPENDENCES + ' && ' + run.COMMAND_PREPARE), 'output_path': VOLUME_PATH}])):
@@ -64,9 +63,9 @@ def deploy_nginx(args = []):
     deploy('nginx', len(args) > 0 and args[0] == '--up')
     show_deploy_path(VOLUME_PATH)
 
-_actions = {}
+exports = {}
 if env.env == 'staging' or env.env == 'production':
-    _actions = {
+    exports = {
         'rails:deploy': {
             'desc': """Deploy into docker as Server.
                                   Before use it:

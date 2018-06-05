@@ -100,9 +100,9 @@ def nginx_remove(args = []):
 
 #----------------------------------------------------------------------------
 
-_actions = {}
+exports = {}
 if env.env == 'staging' or env.env == 'production':
-    _actions = {
+    exports = {
         'nginx:config': {
             'desc': 'Configure nginx',
             'action': conf

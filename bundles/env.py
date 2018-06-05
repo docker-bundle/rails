@@ -74,7 +74,7 @@ def action_run(args = []):
 
 #--------------------------------------------------------------------------------------
 
-_actions = {
+exports = {
     'env:init': {'desc': 'Initial Project Env Config','action': init},
     'run': {'desc': 'Run a command with a container', 'action': action_run},
     'exec': {'desc': 'Exec a command in container', 'action': action(docker_compose_env(_exec()))},
