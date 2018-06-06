@@ -8,7 +8,7 @@ def copy_project_into_volume(copy_target):
     import docker
     client = docker.from_env()
     container = client.containers.run('alpine/git',
-            "-c 'mkdir -p %(output_path)s  && ((git archive --format=tar %(branch)s | tar -x -C  %(output_path)s) \
+            "-c 'rm -rf %(output_path)s && mkdir -p %(output_path)s  && ((git archive --format=tar %(branch)s | tar -x -C  %(output_path)s) \
                     || for item in `ls -a | grep -vE \"^\..$|^\.$|docker|tmp|log|node_modules\"`; do cp -r $item %(output_path)s/$item; done) &&\
                     cp -r docker/env/%(env)s/* %(output_path)s/'"%{ 'output_path': VOLUME_PATH + "_new",
                         'env': env.env, 'branch': os.environ.get('BRANCH', 'HEAD')},
