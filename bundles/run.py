@@ -5,10 +5,10 @@ import docker
 COMMAND_DEPENDENCES='yarn --ignore-engines && bundle'
 COMMAND_DB_MIGRATE='rails db:create && rails db:migrate'
 COMMAND_DB_SEED=COMMAND_DB_MIGRATE + ' && rails db:seed'
-COMMAND_PREPARE='rails assets:precompile'
+COMMAND_PREPARE='rails assets:clean && rails assets:clobber && rails assets:precompile'
 COMMAND_DROP = 'rails db:drop'
 
-volumes = ['yarn', 'node_modules', 'bundle']
+volumes = ['yarn', 'bundle']
 def init_volumes():
     client = docker.from_env()
     for volume in volumes:
