@@ -62,12 +62,22 @@ up = lambda :('up --build -d %s'%SERVICE_NAME)
 down = lambda :('down --remove-orphans')
 start = lambda :('start')
 stop = lambda :('stop')
-shell = lambda :('exec %s bash'%SERVICE_NAME)
 _exec = lambda :('exec %s'%SERVICE_NAME)
 logs  = lambda :('logs')
 
+def restart(args = []):
+    arg_str = ''
+    if len(args) > 0:
+        arg_str = (' ' + ' '.join(args))
+    return os.system(docker_compose_env(stop() + arg_str) + " && " + docker_compose_env(start() + arg_str))
+
 def run(args = [], *, run_args = ''):
     return ("run %s --rm %s sh -c '%s'"%(run_args, SERVICE_NAME, ' '.join(args)))
+
+def shell(args = []):
+    arg_str = ' sh -c "bash || exit 0" '
+    return 0 == os.system(docker_compose_env(_exec() + arg_str)) or \
+            0 == os.system(docker_compose_env(run([arg_str])))
 
 def action_run(args = []):
     return os.system(docker_compose_env(run(args)))
@@ -78,12 +88,11 @@ exports = {
     'env:init': {'desc': 'Initial Project Env Config','action': init},
     'run': {'desc': 'Run a command with a container', 'action': action_run},
     'exec': {'desc': 'Exec a command in container', 'action': action(docker_compose_env(_exec()))},
-    'shell': {'desc': 'Open a Shell into container, if container not start, use `run bash`', 'action': action(docker_compose_env(shell()))},
+    'shell': {'desc': 'Open a Shell into container, if container not start, use `run bash`', 'action': shell},
     'logs': {'desc': 'Show logs', 'action': action(docker_compose_env(logs()))},
     'up': {'desc': 'Create && start server', 'action': action(docker_compose_env(up()))},
     'down': {'desc': 'Stop && remove  server', 'action': action(docker_compose_env(down()))},
     'start': {'desc': 'Start server', 'action': action(docker_compose_env(start()))},
     'stop': {'desc': 'Stop server', 'action': action(docker_compose_env(stop()))},
-    'restart': {'desc': 'Restart server', 'action': action(docker_compose_env(stop()) + " && " + docker_compose_env(start()))}
+    'restart': {'desc': 'Restart specify server, if not, restart all', 'action': restart}
 }
-

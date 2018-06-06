@@ -1,13 +1,13 @@
 import env
 import os
 import sys
+import docker
 
 server_name = env.project_name + '_' + env.env
-def conf(args = []):
-    if len(args) == 0:
-        print('Usage:')
-        print('     nginx:config [domain1] [domain2] ...')
-        return
+def config(args = []):
+    print('         Config Nginx')
+    print()
+    domain_name = input('Your domain-name(s), seperate by space(\' \'): ')
     print()
     print('         Nginx.conf')
     print('-'*80)
@@ -31,7 +31,7 @@ server {
     proxy_pass http://%(server_name)s_server;
    }
 }"""%{'server_name': server_name,
-      'domain_names': ' '.join(args)})
+      'domain_names': domain_name})
     print(config)
     print('-'*80)
     try:
@@ -43,21 +43,20 @@ server {
     f.write(config)
     f.flush()
     f.close()
-    print('Write to ' + write_path)
+    print('Write to ' + os.path.realpath(write_path))
 
 name = 'nginx-deploy'
 def nginx_up(args = []):
-    import docker
     client = docker.from_env()
     try:
-        network = client.networks.get(name)
+        client.networks.get(name)
         print('[NETWORK]          %s up-to-date'%name)
     except:
         client.networks.create(name)
         print('[NETWORK]          %s create'%name)
     try:
         container = client.containers.get(name)
-        print('[NGINX]          %s up-to-date'%name)
+        print('[NGINX]            %s up-to-date'%name)
     except:
         container = client.containers.run('nginx:1.13.12-alpine',
                 name = name,
@@ -70,30 +69,43 @@ def nginx_up(args = []):
                         'bind': '/etc/nginx/conf.d/'
                     }
                 },
-                ports =  {'80/tcp': 80},
+                ports =  {'80/tcp': int(os.environ.get('PORT', '80'))},
+                restart_policy = {'Name': 'always'},
                 detach = True,
-                remove = True
+                command = 'sh -c "nginx -t && nginx -g \'daemon off;\'"'
             )
-        print('[NGINX]          %s create'%name)
+        print('[NGINX]            %s create'%name)
+        print(container.logs().decode())
 
 def nginx_down(args = []):
-    import docker
     client = docker.from_env()
     try:
         container = client.containers.get(name)
         container.stop()
+        container.remove()
         print('[NGINX]            %s stoped'%name)
     except:
         print(sys.exc_info()[1])
     try:
-        network = client.networks.get(name)
-        network.remove()
+        client.networks.get(name).remove()
         print('[NETWORK]          %s remove'%name)
     except:
         print(sys.exc_info()[1])
 
+def nginx_clean(args = []):
+    client = docker.from_env()
+    for _name in ['nginx-config', name]:
+        try:
+            client.volumes.get(_name).remove()
+            print('[CONFIG]           %s remove'%_name)
+        except:
+            print(sys.exc_info()[1])
+
 def nginx_add(args = []):
-    os.system('docker cp site/%(server_name)s %(name)s:/etc/nginx/conf.d//%(server_name)s.conf && docker exec %(name)s nginx -s reload'%{'server_name': server_name, 'name': name})
+    if not os.path.isfile(os.path.join('site', server_name)):
+        config()
+    os.system('docker cp site/%(server_name)s %(name)s:/etc/nginx/conf.d/%(server_name)s.conf &&\
+        docker exec %(name)s sh -c "(nginx -t && nginx -s reload) || rm -rf /etc/nginx/conf.d/%(server_name)s.conf"'%{'server_name': server_name, 'name': name})
 
 def nginx_remove(args = []):
     os.system('docker exec %(name)s sh -c "rm /etc/nginx/conf.d/%(server_name)s.conf && nginx -s reload"'%{'server_name': server_name, 'name': name})
@@ -105,7 +117,7 @@ if env.env == 'staging' or env.env == 'production':
     exports = {
         'nginx:config': {
             'desc': 'Configure nginx',
-            'action': conf
+            'action': config
         },
         'nginx:add': {
             'desc': 'Commit nginx.conf to nginx',
@@ -116,11 +128,15 @@ if env.env == 'staging' or env.env == 'production':
             'action': nginx_remove
         },
         'nginx:up': {
-            'desc': 'Start Nginx server',
+            'desc': 'Start Nginx server, -e PORT=? set port(default 80)',
             'action': nginx_up
         },
         'nginx:down': {
             'desc': 'Stop Nginx server',
             'action': nginx_down
+        },
+        'nginx:clean': {
+            'desc': 'Clean Nginx config',
+            'action': nginx_clean
         }
     }

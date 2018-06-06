@@ -20,7 +20,7 @@ def init_volumes():
             print('[VOLUME]     \'%s\' is created'%volume)
 def clean_deps(args = []):
     client = docker.from_env()
-    for volume in volumes:
+    for volume in volumes + [env.env + '_node_modules']:
         volume = env.project_name + '_' + volume
         try:
             client.volumes.get(volume).remove()
@@ -32,23 +32,25 @@ def prepare(args = []):
     os.system(env.docker_compose_env(env.run(['%s && %s'%(COMMAND_DEPENDENCES, COMMAND_PREPARE)], run_args = '--no-deps')))
 
 def sync(args = []):
-    os.system(env.docker_compose_env(env.run(['%s && %s'%(COMMAND_DEPENDENCES, COMMAND_DB_MIGRATE)])))
+    if 0 != os.system(env.docker_compose_env(env.run(['%s && %s'%(COMMAND_DEPENDENCES, COMMAND_DB_MIGRATE)]))):
+        config_info()
 
 def migrate(args = []):
     os.system(env.docker_compose_env(env.run(['%s'%(COMMAND_DB_MIGRATE)])))
 
 def seed(args = []):
-    os.system(env.docker_compose_env(env.run(['%s && %s'%(COMMAND_DEPENDENCES, COMMAND_DB_SEED)])))
+    if 0 != os.system(env.docker_compose_env(env.run(['%s && %s'%(COMMAND_DEPENDENCES, COMMAND_DB_SEED)]))):
+        config_info()
 
 def rails_new(args = []):
     if 0 == os.system(env.docker_compose_env(env.run(['gem install rails && rails new . -d postgresql --webpack=vue']))):
-        print(
-"""
-=============================================================================================
-            INSTALL FINISH
-=============================================================================================
+        print('='*80)
+        print("\n            INSTALL FINISH\n")
+        config_info()
 
-Now you will add this config (inside '++++') manually by default database connection config
+def config_info(args = []):
+    print('='*80)
+    print("""You may need add this config (inside '++++') manually as default database connection config
 
 Open `config/database.yml`:
 ------------------------------------------------------------------------------

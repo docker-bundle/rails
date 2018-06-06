@@ -1,7 +1,7 @@
 import env
 import run
 import deploy
-import nginx_conf
+import nginx
 
 def include(*libs):
     actions = {}
@@ -13,4 +13,4 @@ def include(*libs):
 actions = include(env,
                   run,
                   deploy,
-                  nginx_conf)
+                  nginx)
