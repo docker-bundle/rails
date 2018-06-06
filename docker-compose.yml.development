@@ -9,3 +9,4 @@ services:
       - "3000:3000"
     environment:
       RAILS_ENV: development
+      RAILS_SERVE_STATIC_FILES: 1
