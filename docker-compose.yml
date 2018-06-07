@@ -13,6 +13,7 @@ services:
   app:
     image: dockerbundle/rails
     environment:
+      DOCKER_ENV: $ENV
       DATABASE_HOSTNAME: db
       LINES: 40
       COLUMNS: 120

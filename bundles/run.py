@@ -6,7 +6,7 @@ COMMAND_DEPENDENCES='yarn --ignore-engines && bundle'
 COMMAND_DB_MIGRATE='rails db:create && rails db:migrate'
 COMMAND_DB_SEED=COMMAND_DB_MIGRATE + ' && rails db:seed'
 COMMAND_PREPARE='rails assets:clean && rails assets:clobber && rails assets:precompile'
-COMMAND_DROP = 'rails db:drop'
+COMMAND_DROP = COMMAND_DEPENDENCES + '&& rails db:drop'
 
 volumes = ['yarn', 'bundle']
 def init_volumes():
@@ -47,24 +47,61 @@ def rails_new(args = []):
         print('='*80)
         print("\n            INSTALL FINISH\n")
         config_info()
+        file_update_hint()
 
-def config_info(args = []):
-    print('='*80)
-    print("""You may need add this config (inside '++++') manually as default database connection config
+def config_info():
+    print()
+    print("""You may need modify some config manually as default database connection config
 
 Open `config/database.yml`:
-------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------
 default: &default
   ...
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  username: postgres
-  password:
-  host: <%= ENV.fetch('DATABASE_HOSTNAME', '127.0.0.1') %>
-  port: 5432
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+   +++
+   username: postgres
+   password:
+   host: <%= ENV.fetch('DATABASE_HOSTNAME', '127.0.0.1') %>
+   port: 5432
+   +++
+
   ...
-------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------
 """)
+
+def file_update_hint():
+    print()
+    print("""Watch file change in development env
+
+Manually modify code into file
+
+Open `config/webpacker.yml`:
+----------------------------------------------------------------------------------------------------------------------------------------
+development:
+    ...
+    dev_server:
+        ...
+        watch_options:
+            ...
+
++            poll: process.env['DOCKER_ENV'] !== undefined
+
+            ...
+----------------------------------------------------------------------------------------------------------------------------------------
+
+Open `config/environments/development.rb`
+----------------------------------------------------------------------------------------------------------------------------------------
+
+- config.file_watcher = ActiveSupport::EventedFileUpdateChecker
+
++ config.file_watcher = ENV['DOCKER_ENV'].present? ? ActiveSupport::FileUpdateChecker : ActiveSupport::EventedFileUpdateChecker
+
+----------------------------------------------------------------------------------------------------------------------------------------
+""")
+
+def hint(args = []):
+    config_info()
+    file_update_hint()
 
 def rails_c(args = []):
     os.system(env.docker_compose_env(env.run(['rails c'])))
@@ -123,7 +160,11 @@ exports = {
     'rails:clean': {
         'desc': 'Clean depends',
         'action': clean_deps
-    }
+    },
+    'rails:hint': {
+        'desc': 'Show hint',
+        'action': hint
+    },
 }
 
 no_production_actions = {

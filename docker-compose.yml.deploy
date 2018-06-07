@@ -14,3 +14,5 @@ services:
     volumes:
       - ./deploy:/deploy
       - node_modules:/deploy/${PROJECT_NAME}_${ENV}${NEW}/node_modules
+      - ./shared/${PROJECT_NAME}_${ENV}/log:/deploy/${PROJECT_NAME}_${ENV}${NEW}/log
+      - ./shared/${PROJECT_NAME}_${ENV}/tmp:/deploy/${PROJECT_NAME}_${ENV}${NEW}/tmp
