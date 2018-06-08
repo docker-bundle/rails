@@ -32,7 +32,7 @@ if not os.environ.get('PROJECT_NAME'):
     init()
 
 config_file_name = 'docker-compose.yml'
-env = os.environ.get('ENV', 'development')
+env = os.environ['ENV'] = os.environ.get('ENV', 'development')
 project_name = os.environ.get('PROJECT_NAME')
 
 DOCKER_COMPOSE='docker-compose'
