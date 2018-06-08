@@ -187,4 +187,3 @@ if env.env == 'staging' or env.env == 'production':
             'action': nginx_clean
         }
     }
-

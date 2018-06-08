@@ -94,5 +94,7 @@ exports = {
     'down': {'desc': 'Stop && remove  server', 'action': action(docker_compose_env(down()))},
     'start': {'desc': 'Start server', 'action': action(docker_compose_env(start()))},
     'stop': {'desc': 'Stop server', 'action': action(docker_compose_env(stop()))},
-    'restart': {'desc': 'Restart specify server, if not, restart all', 'action': restart}
+    'restart': {'desc': 'Restart specify server, if not, restart all', 'action': restart},
+    'ps': {'desc': 'Show containers', 'action': action(docker_compose_env('ps'))},
+    'compose': {'desc': 'Use as docker-compose\n' + ' -'*50, 'action': action(docker_compose_env(''))},
 }

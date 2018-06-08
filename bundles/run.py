@@ -47,14 +47,14 @@ def rails_new(args = []):
         print('='*80)
         print("\n            INSTALL FINISH\n")
         config_info()
-        file_update_hint()
+        show_hint()
 
 def config_info():
     print()
     print("""You may need modify some config manually as default database connection config
 
 Open `config/database.yml`:
-----------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
 default: &default
   ...
 
@@ -66,17 +66,19 @@ default: &default
    +++
 
   ...
-----------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
 """)
 
-def file_update_hint():
+def show_hint():
     print()
     print("""Watch file change in development env
 
 Manually modify code into file
 
+[Webpack-dev]
+
 Open `config/webpacker.yml`:
-----------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
 development:
     ...
     dev_server:
@@ -87,21 +89,45 @@ development:
 +            poll: process.env['DOCKER_ENV'] !== undefined
 
             ...
-----------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
+
+[Rails-dev]
 
 Open `config/environments/development.rb`
-----------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
 
 - config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
 + config.file_watcher = ENV['DOCKER_ENV'].present? ? ActiveSupport::FileUpdateChecker : ActiveSupport::EventedFileUpdateChecker
 
-----------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
+
+[Rails-production] (optional)
+
+Open `config/environments/production.rb`
+---------------------------------------------------------------------------------------
+
+  # Use a different cache store in production.
+- # config.cache_store = :mem_cache_store
++ config.cache_store = :redis_store,  "#{ENV.fetch('REDIS_URL', 'redis://127.0.0.1:6379/')}/0/cache"
+
+---------------------------------------------------------------------------------------
+
+Open `Gemfile`
+---------------------------------------------------------------------------------------
++++
+gem 'redis'
+gem 'redis-store'
+gem 'redis-rails'
++++
+---------------------------------------------------------------------------------------
+run `rails:sync`
+
 """)
 
 def hint(args = []):
     config_info()
-    file_update_hint()
+    show_hint()
 
 def rails_c(args = []):
     os.system(env.docker_compose_env(env.run(['rails c'])))
@@ -173,7 +199,7 @@ no_production_actions = {
         'action': rails_drop
     },
     'rails:reset': {
-        'desc': 'drop && seed',
+        'desc': 'Drop && seed (only available development/staging environments)',
         'action': rails_reset
     },
 }

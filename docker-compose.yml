@@ -15,6 +15,7 @@ services:
     environment:
       DOCKER_ENV: $ENV
       DATABASE_HOSTNAME: db
+      REDIS_URL: 'redis://redis:6379/'
       LINES: 40
       COLUMNS: 120
     working_dir: /home/${PROJECT_NAME}
