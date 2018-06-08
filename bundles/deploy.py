@@ -4,7 +4,8 @@ import os
 import sys
 import docker
 
-VOLUME_PATH = "/deploy/" + env.project_name + "_" + env.env
+server_name = env.project_name + '_' + env.env
+VOLUME_PATH = "/deploy/" + server_name
 def copy_project_into_volume(copy_target):
     client = docker.from_env()
     container = client.containers.run('alpine/git',
@@ -49,9 +50,10 @@ def deploy(mode, onlyUp = False):
     return 0 == call_docker_compose_deploy(env.up())
 
 def show_deploy_path(path):
-    print('='*80)
+    print('='*160)
     print('     Deploy path: %s'%path)
-    print('='*80)
+    print('        Log path: %s'%os.path.realpath('./shared/' + server_name))
+    print('='*160)
 
 def check_config_path():
     config_path = os.path.realpath(os.path.join('env', env.env))
