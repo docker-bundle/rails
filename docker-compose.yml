@@ -2,16 +2,20 @@ version: '3'
 services:
   redis:
     image: redis:3.2.11-alpine
+    restart: always
     networks:
       lan:
   db:
     image: postgres:10.4-alpine
+    restart: always
     networks:
       lan:
     volumes:
       - db:/var/lib/postgresql/data
   app:
-    image: dockerbundle/rails
+    build: .
+    image: ${PROJECT_NAME}
+    restart: always
     environment:
       DOCKER_ENV: $ENV
       DATABASE_HOSTNAME: db

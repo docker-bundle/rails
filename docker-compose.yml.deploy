@@ -1,12 +1,7 @@
 version: '3'
 services:
-  db:
-    restart: always
-  redis:
-    restart: always
   app:
     command:  sh -c "SECRET_KEY_BASE=`bundle exec rails secret` bundle exec rails s -b 0.0.0.0 -p 3000 -P /tmp/server.pid"
-    restart: always
     environment:
       RAILS_ENV: production
       RAILS_SERVE_STATIC_FILES: 0
