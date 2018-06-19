@@ -4,7 +4,7 @@ services:
     command:  sh -c "bundle exec rails s -b 0.0.0.0 -p 3000 -P /tmp/server.pid"
     ports:
       # site
-      - "3100:3000"
+      - "${STAGING_PORT}:3000"
     environment:
       RAILS_ENV: production
       RAILS_SERVE_STATIC_FILES: 1
