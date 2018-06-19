@@ -1,7 +1,7 @@
 version: '3'
 services:
   app:
-    command:  sh -c "SECRET_KEY_BASE=`bundle exec rails secret` bundle exec rails s -b 0.0.0.0 -p 3000 -P /tmp/server.pid"
+    command:  sh -c "bundle exec rails s -b 0.0.0.0 -p 3000 -P /tmp/server.pid"
     ports:
       # site
       - "3200:3000"
