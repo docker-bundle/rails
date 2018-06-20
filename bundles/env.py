@@ -14,31 +14,27 @@ def input_default(text, default):
         value = default
     return value
 
+def input_num(hint, default, num_range, error):
+    while True:
+        value = input_default(hint, default)
+        try:
+            num = int(value)
+        except:
+            num = None
+        if num in num_range:
+            return num
+        else:
+            print(error)
+
 def init(args = []):
     print()
     project_name = input_default("Please input your project name", os.path.basename(os.path.dirname(os.getcwd())))
-    while True:
-        staging_port = input_default("Staging port", "3100")
-        try:
-            port_num = int(staging_port)
-        except:
-            port_num = 0
-        if 0 < port_num and port_num < 65536:
-            break
-        else:
-            print('Port invalid')
-    while True:
-        production_port = input_default("Production port", "3200")
-        try:
-            port_num = int(production_port)
-        except:
-            port_num = 0
-        if 0 < port_num and port_num < 65536:
-            break
-        else:
-            print('Port invalid')
+    development_port = input_num("Development port", "3000", range(1,65536), "Port invalid")
+    staging_port = input_num("Staging port", "3100", range(1,65536), "Port invalid")
+    production_port = input_num("Production port", "3200", range(1,65536), "Port invalid")
     env_file = open('.env', 'w')
     env_file.write("PROJECT_NAME=%s\n"%project_name.replace(' ', '_').replace(':', '_'))
+    env_file.write("DEVELOPMENT_PORT=%s\n"%development_port)
     env_file.write("STAGING_PORT=%s\n"%staging_port)
     env_file.write("PRODUCTION_PORT=%s\n"%production_port)
     env_file.flush()

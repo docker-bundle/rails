@@ -6,6 +6,6 @@ services:
       # webpack-dev-server
       - "3035:3035"
       # site
-      - "3000:3000"
+      - "${DEVELOPMENT_PORT}:3000"
     environment:
       RAILS_SERVE_STATIC_FILES: 1
