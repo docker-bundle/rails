@@ -2,7 +2,7 @@ import os
 import env
 import docker
 
-COMMAND_DEPENDENCES='yarn --ignore-engines && bundle'
+COMMAND_DEPENDENCES='yarn --ignore-engines && bundler'
 COMMAND_DB_MIGRATE='rails db:create && rails db:migrate'
 COMMAND_DB_SEED=COMMAND_DB_MIGRATE + ' && rails db:seed'
 COMMAND_PREPARE='rails assets:clean && rails assets:clobber && rails assets:precompile'
