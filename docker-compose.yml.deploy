@@ -1,7 +1,7 @@
 version: '3'
 services:
   app:
-    command:  sh -c "bundle exec rails s -b 0.0.0.0 -p 3000 -P /tmp/server.pid"
+    command: docker/run.sh
     environment:
       RAILS_ENV: production
       RAILS_SERVE_STATIC_FILES: 0

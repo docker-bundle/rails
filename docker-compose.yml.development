@@ -1,7 +1,7 @@
 version: '3'
 services:
   app:
-    command:  sh -c "WEBPACKER_DEV_SERVER_HOST=0.0.0.0 bin/webpack-dev-server & bundle exec rails s -b 0.0.0.0 -p 3000 -P /tmp/server.pid"
+    command: docker/run-dev.sh
     ports:
       # webpack-dev-server
       - "3035:3035"

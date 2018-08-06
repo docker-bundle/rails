@@ -1,7 +1,7 @@
 version: '3'
 services:
   app:
-    command:  sh -c "bundle exec rails s -b 0.0.0.0 -p 3000 -P /tmp/server.pid"
+    command: docker/run.sh
     ports:
       # site
       - "${PRODUCTION_PORT}:3000"
