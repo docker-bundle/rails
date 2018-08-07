@@ -28,10 +28,10 @@ def input_num(hint, default, num_range, error):
 
 def init(args = []):
     print()
-    project_name = input_default("Please input your project name", os.path.basename(os.path.dirname(os.getcwd())))
-    development_port = input_num("Development port", "3000", range(1,65536), "Port invalid")
-    staging_port = input_num("Staging port", "3100", range(1,65536), "Port invalid")
-    production_port = input_num("Production port", "3200", range(1,65536), "Port invalid")
+    project_name = input_default("Please input your project name", os.environ['PROJECT_NAME'] or os.path.basename(os.path.dirname(os.getcwd())))
+    development_port = input_num("Development port", os.environ['DEVELOPMENT_PORT'] or "3000", range(1,65536), "Port invalid")
+    staging_port = input_num("Staging port", os.environ['STAGING_PORT'] or "3100", range(1,65536), "Port invalid")
+    production_port = input_num("Production port", os.environ['PRODUCTION_PORT'] or "3200", range(1,65536), "Port invalid")
     env_file = open('.env', 'w')
     env_file.write("PROJECT_NAME=%s\n"%project_name.replace(' ', '_').replace(':', '_'))
     env_file.write("DEVELOPMENT_PORT=%s\n"%development_port)
