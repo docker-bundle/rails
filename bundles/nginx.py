@@ -17,7 +17,7 @@ def config(args = [], *, checkIfExist = True):
     domain_name = input('Your domain-name(s), seperate by space(\' \'): ')
     print()
     print('         Nginx.conf')
-    print('-'*80)
+    print(env.line_seperator('-', 80))
     config =(
 """upstream %(server_name)s_server {
   server %(server_name)s:3000;
@@ -40,7 +40,7 @@ server {
 }"""%{'server_name': server_name,
       'domain_names': domain_name})
     print(config)
-    print('-'*80)
+    print(env.line_seperator('-', 80))
     try:
         os.makedirs('site')
     except:
@@ -81,9 +81,9 @@ def nginx_up(args = []):
                     )
         except:
             print(sys.exc_info()[1].stderr.decode())
-            print('x' * 100)
+            print(env.line_seperator('x', 100))
             print('     You may need command `nginx:remove [not-found-host]` to clean unused nginx config file ')
-            print('x' * 100)
+            print(env.line_seperator('x', 100))
             return
         container = client.containers.run(nginx_image,
                 name = name,
@@ -133,9 +133,9 @@ def nginx_add(args = []):
         config(checkIfExist = False)
     if 0 != os.system('docker cp site/%(server_name)s %(name)s:/etc/nginx/conf.d/%(server_name)s.conf &&\
         docker exec %(name)s sh -c "(nginx -t && nginx -s reload) || rm -rf /etc/nginx/conf.d/%(server_name)s.conf"'%{'server_name': server_name, 'name': name}):
-        print('x' * 100)
+        print(env.line_seperator('x', 100))
         print('     You may `nginx:up` first')
-        print('x' * 100)
+        print(env.line_seperator('x', 100))
 
 def nginx_remove(args = []):
     target = server_name

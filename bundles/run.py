@@ -44,7 +44,7 @@ def seed(args = []):
 
 def rails_new(args = []):
     if 0 == os.system(env.docker_compose_env(env.run(['gem install rails && rails new . -d postgresql --webpack=vue']))):
-        print('='*80)
+        print(env.line_seperator('=', 80))
         print("\n            INSTALL FINISH\n")
         config_info()
         show_hint()
@@ -146,16 +146,16 @@ def rails_publish(args = []):
 
 all_envs = ['development', 'staging', 'production']
 if env.env not in all_envs:
-    print("-"*100)
+    print(env.line_seperator('-', 100))
     print('[ERROR]          ENV must in [' + ','.join(all_envs) + ']')
-    print("-"*100)
+    print(env.line_seperator('-', 100))
     exit()
 
-print("-"*100)
+print(env.line_seperator('-', 100))
 print("                         Rails on Docker")
 print("")
 print("    ENV=%s               [development(default), staging, production]    ( -e ENV=?)"%(env.env))
-print("-"*100)
+print(env.line_seperator('-', 100))
 init_volumes()
 
 exports = {

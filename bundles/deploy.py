@@ -50,10 +50,10 @@ def deploy(mode, onlyUp = False):
     return 0 == call_docker_compose_deploy(env.up())
 
 def show_deploy_path(path):
-    print('='*160)
+    print(env.line_seperator('=', 160))
     print('     Deploy path: %s'%path)
     print('        Log path: %s'%os.path.realpath('./shared/' + server_name))
-    print('='*160)
+    print(env.line_seperator('=', 160))
 
 def check_config_path():
     config_path = os.path.realpath(os.path.join('env', env.env))

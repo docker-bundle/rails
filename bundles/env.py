@@ -1,5 +1,13 @@
 import os
 
+def line_seperator(sep_str, max_len = None):
+    line_len = os.get_terminal_size().columns
+    out_len = min(max_len or line_len, line_len)
+    out_str = sep_str
+    if len(out_str) > 0 and out_len > len(out_str):
+        out_str = sep_str * (out_len // len(out_str))
+    return out_str
+
 def load_env():
     try:
         for e in list(filter(lambda x:x!='', map(lambda x:x.strip(), open('.env').readlines()))):
@@ -28,10 +36,10 @@ def input_num(hint, default, num_range, error):
 
 def init(args = []):
     print()
-    project_name = input_default("Please input your project name", os.environ['PROJECT_NAME'] or os.path.basename(os.path.dirname(os.getcwd())))
-    development_port = input_num("Development port", os.environ['DEVELOPMENT_PORT'] or "3000", range(1,65536), "Port invalid")
-    staging_port = input_num("Staging port", os.environ['STAGING_PORT'] or "3100", range(1,65536), "Port invalid")
-    production_port = input_num("Production port", os.environ['PRODUCTION_PORT'] or "3200", range(1,65536), "Port invalid")
+    project_name = input_default("Please input your project name", os.environ.get('PROJECT_NAME') or os.path.basename(os.path.dirname(os.getcwd())))
+    development_port = input_num("Development port", os.environ.get('DEVELOPMENT_PORT') or "3000", range(1,65536), "Port invalid")
+    staging_port = input_num("Staging port", os.environ.get('STAGING_PORT') or "3100", range(1,65536), "Port invalid")
+    production_port = input_num("Production port", os.environ.get('PRODUCTION_PORT') or "3200", range(1,65536), "Port invalid")
     env_file = open('.env', 'w')
     env_file.write("PROJECT_NAME=%s\n"%project_name.replace(' ', '_').replace(':', '_'))
     env_file.write("DEVELOPMENT_PORT=%s\n"%development_port)
@@ -114,5 +122,5 @@ exports = {
     'stop': {'desc': 'Stop server', 'action': action(docker_compose_env(stop()))},
     'restart': {'desc': 'Restart specify server, if not, restart all', 'action': restart},
     'ps': {'desc': 'Show containers', 'action': action(docker_compose_env('ps'))},
-    'compose': {'desc': 'Use as docker-compose\n' + ' -'*50, 'action': action(docker_compose_env(''))},
+    'compose': {'desc': 'Use as docker-compose\n' + line_seperator(' -', 100), 'action': action(docker_compose_env(''))},
 }
