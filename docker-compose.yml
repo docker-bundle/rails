@@ -1,10 +1,13 @@
 version: '3'
 services:
   redis:
+    command: redis-server --appendonly yes
     image: redis:3.2.11-alpine
     restart: always
     networks:
       lan:
+    volumes:
+      - redis:/data
   db:
     image: postgres:10.4-alpine
     restart: always
@@ -42,6 +45,7 @@ services:
       - db
       - redis
 volumes:
+  redis:
   db:
   node_modules:
   yarn:
