@@ -1,4 +1,4 @@
-FROM ruby:2.5.1-slim-stretch
+FROM ruby:2.5.3-slim-stretch
 
 # deps
 
@@ -11,7 +11,7 @@ RUN apt-get update \
 # node
 # depends_on: [xz-utils, axel]
 
-ENV NODE_VERSION 10.2.1
+ENV NODE_VERSION 11.0.0
 ENV NODE_BIN "node-v$NODE_VERSION-linux-x64"
 
 RUN mkdir "/tmp/$NODE_BIN" && cd "/tmp/$NODE_BIN" \
@@ -30,5 +30,3 @@ RUN apt-get update \
     && apt-get install -y build-essential patch ruby-dev zlib1g-dev liblzma-dev libpq-dev python \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-
-RUN gem install bundler
